@@ -1,0 +1,60 @@
+# Single source of truth for catalog, schemas, table names, paths and model settings.
+# Entrypoints read this file and pass plain values into the classes.
+
+catalog_name: catalog_mle
+
+schemas:
+  bronze: bronze
+  silver: silver
+  gold: gold
+  config: config
+  ml: ml
+
+tables:
+  bronze_raw: supply_chain_transactions_raw
+  silver_clean: supply_chain_transactions_clean
+  dq_failed: dq_failed_records
+  gold_daily: demand_daily_aggregated
+  gold_features: demand_features
+  feature_store: demand_features_fs
+  train_pool: demand_features_train_pool
+  inference_holdout: demand_features_inference_holdout
+  train: demand_features_train
+  validation: demand_features_validation
+  predictions_validation: demand_predictions_validation
+
+paths:
+  source_csv: "/Volumes/catalog_mle/default/raw_data/supply_chain_dataset(in).csv"
+  # relative to the project root (the folder that contains config/ and src/)
+  dq_rules: "config/dq_rules.json"
+
+feature_store:
+  primary_keys: [product_name, destination_city, transaction_date]
+  description: >-
+    Demand forecasting feature table: daily aggregated demand per product+city,
+    with calendar features (day_of_week, month) and transaction-ordered
+    lag/rolling demand features.
+
+split:
+  fraction: 0.8   # earlier 80% of dates vs later 20%, applied twice
+
+model:
+  name: demand_forecasting_catboost       # registered as <catalog>.<ml schema>.<name>
+  experiment_name: /Shared/demand_forecasting_catboost
+  run_name: catboost_baseline
+  target: total_demand
+  features:
+    - product_name
+    - destination_city
+    - avg_unit_price
+    - total_inventory
+    - day_of_week
+    - month
+    - demand_lag_1
+    - demand_lag_7
+    - rolling_avg_7
+  cat_features: [product_name, destination_city]
+  params:
+    iterations: 500
+    learning_rate: 0.05
+    depth: 6

@@ -1,0 +1,7 @@
+catboost==1.2.10
+databricks-feature-engineering>=0.18.0
+mlflow>=3.0
+scikit-learn
+pandas
+numpy
+pyyaml

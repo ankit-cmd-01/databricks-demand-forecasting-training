@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+catboost_info/
+.databricks/
+.venv/
+.idea/
+.vscode/

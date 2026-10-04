@@ -1,0 +1,58 @@
+{
+  "column_rules": {
+    "transaction_id": {
+      "nullable": false,
+      "unique": true
+    },
+    "product_name": {
+      "nullable": false
+    },
+    "supplier_name": {
+      "nullable": false
+    },
+    "destination_city": {
+      "nullable": false
+    },
+    "transaction_date": {
+      "nullable": false
+    },
+    "disruption_type": {
+      "nullable": true
+    },
+    "ordered_quantity": {
+      "nullable": false,
+      "min": 0
+    },
+    "demand_quantity": {
+      "nullable": false,
+      "min": 0
+    },
+    "available_inventory": {
+      "nullable": false,
+      "min": 0
+    },
+    "unit_price_usd": {
+      "nullable": false,
+      "min": 0
+    },
+    "product_cost_usd": {
+      "nullable": false,
+      "min": 0
+    },
+    "transportation_cost_usd": {
+      "nullable": false,
+      "min": 0
+    },
+    "total_cost_usd": {
+      "nullable": false,
+      "min": 0
+    }
+  },
+  "business_rules": [
+    {
+      "name": "total_cost_check",
+      "condition": "total_cost_usd = product_cost_usd + transportation_cost_usd",
+      "description": "Total cost should equal product cost plus transportation cost"
+    }
+  ]
+}
