@@ -1,0 +1,52 @@
+bundle:
+  name: demand_forecasting
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-ae8067eb-0ead.cloud.databricks.com
+
+resources:
+  jobs:
+    demand_forecasting_pipeline:
+      name: demand_forecasting_pipeline
+
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+
+      environments:
+        - environment_key: data_engineering_environment
+          spec:
+            environment_version: "6"
+            # keep in sync with src/requirements.txt
+            dependencies:
+              - catboost==1.2.10
+              - databricks-feature-engineering>=0.18.0
+              - mlflow>=3.0
+              - scikit-learn
+              - pandas
+              - numpy
+              - pyyaml
+
+      tasks:
+        - task_key: data_engineering
+          environment_key: data_engineering_environment
+          spark_python_task:
+            python_file: ./src/1_data_engineering/de_entrypoint.py
+
+        - task_key: model_training
+          depends_on:
+            - task_key: data_engineering
+          environment_key: data_engineering_environment
+          spark_python_task:
+            python_file: ./src/2_model_training/model_train_entrypoint.py
+
+        - task_key: inference
+          depends_on:
+            - task_key: model_training
+          environment_key: data_engineering_environment
+          spark_python_task:
+            python_file: ./src/3_inference/inference_entrypoint.py
