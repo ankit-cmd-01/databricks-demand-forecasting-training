@@ -3,13 +3,14 @@ name: Deploy demand forecasting bundle
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     env:
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +22,5 @@ jobs:
       - name: Deploy bundle
         run: databricks bundle deploy -t dev
 
-      # only when you start the workflow by hand from the Actions tab
       - name: Run pipeline
-        if: github.event_name == 'workflow_dispatch'
         run: databricks bundle run demand_forecasting_pipeline -t dev
