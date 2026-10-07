@@ -1,3 +1,5 @@
+from typing import Any   # <-- CHANGE 1 (new line)
+
 import mlflow
 from mlflow.tracking import MlflowClient
 
@@ -10,7 +12,7 @@ class ModelPredictions:
         self.model_name = model_name
         self.validation_table = validation_table
         self.predictions_table = predictions_table
-        self.model = None
+        self.model: Any = None   # <-- CHANGE 2 (was: self.model = None)
         self.features = None
 
     def load_model(self):
