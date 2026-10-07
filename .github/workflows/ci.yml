@@ -32,13 +32,13 @@ jobs:
       - name: Install mypy
         run: pip install mypy types-PyYAML
       - name: Check types
-        run: mypy src --ignore-missing-imports --check-untyped-defs --explicit-package-bases
+        run: mypy src --ignore-missing-imports --check-untyped-defs 
 
   unit-tests:
     name: Unit tests (pytest)
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: src:src/1_data_engineering:src/2_model_training
+      PYTHONPATH: src:src/1_data_engineering
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
