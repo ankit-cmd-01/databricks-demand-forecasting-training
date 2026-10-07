@@ -1,3 +1,12 @@
+bundle:
+  name: demand_forecasting
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-ae8067eb-0ead.cloud.databricks.com
 
 resources:
   jobs:
@@ -6,13 +15,15 @@ resources:
 
       queue:
         enabled: true
+
       performance_target: PERFORMANCE_OPTIMIZED
 
       environments:
         - environment_key: data_engineering_environment
           spec:
             environment_version: "6"
-            # keep in sync with src/requirements.txt
+
+            # Keep in sync with src/requirements.txt
             dependencies:
               - catboost==1.2.10
               - databricks-feature-engineering>=0.18.0
@@ -23,6 +34,7 @@ resources:
               - pyyaml
 
       tasks:
+
         - task_key: data_engineering
           environment_key: data_engineering_environment
           spark_python_task:
@@ -41,3 +53,15 @@ resources:
           environment_key: data_engineering_environment
           spark_python_task:
             python_file: ../src/3_inference/inference_entrypoint.py
+
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: Asia/Kolkata
+        pause_status: UNPAUSED
+
+      email_notifications:
+        on_success:
+          - ankitstorage2023@gmail.com
+
+        on_failure:
+          - ankitstorage2023@gmail.com
