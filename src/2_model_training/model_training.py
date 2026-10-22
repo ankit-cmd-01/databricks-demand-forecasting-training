@@ -5,9 +5,11 @@ from catboost import CatBoostRegressor
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+from model_selection import select_champion
+
 
 class ModelTraining:
-    """Trains a CatBoost model on the train split, logs it to MLflow and registers it in Unity Catalog."""
+    """Trains a CatBoost model, logs it to MLflow and registers it in Unity Catalog only if it beats the champion."""
 
     def __init__(self, spark, train_table, validation_table, model_name, experiment_name,
                  params, features, cat_features, target, run_name="catboost_baseline"):
@@ -23,6 +25,7 @@ class ModelTraining:
         self.run_name = run_name
         self.run_id = None
         self.model_uri = None
+        self.mae = None   # validation MAE of the new model (used to compare with the champion)
 
     def load_data(self):
         """Load train and validation splits as pandas and separate features from target."""
@@ -69,21 +72,19 @@ class ModelTraining:
                 signature=signature,
                 input_example=self.X_train.head(5),
             )
+            self.mae = metrics["mae"]
             self.run_id = run.info.run_id
             self.model_uri = model_info.model_uri
 
         print("MAE:", metrics["mae"], "RMSE:", metrics["rmse"], "R2:", metrics["r2"])
         print("Run ID:", self.run_id)
 
-    def register_model(self):
-        """Register the logged model as a new version in the Unity Catalog Model Registry."""
-        registered = mlflow.register_model(model_uri=self.model_uri, name=self.model_name)
-        print("Registered model:", registered.name)
-        print("Version:", registered.version)
-        return registered
+    def select_champion(self):
+        """Register the new model only if it beats the current champion (see model_selection.py)."""
+        select_champion(self.model_name, self.model_uri, self.mae, self.X_val, self.y_val)
 
     def run(self):
         self.load_data()
         self.setup_mlflow()
         self.train_and_log()
-        self.register_model()
+        self.select_champion()
