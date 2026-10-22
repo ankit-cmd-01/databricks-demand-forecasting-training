@@ -17,7 +17,7 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Check code style
-        run: ruff check . --line-length 120 --select E --ignore E402,W292
+        run: ruff check . --line-length 120 --select E,F --ignore E402
 
   type-check:
     name: Type check (mypy)
@@ -32,13 +32,13 @@ jobs:
       - name: Install mypy
         run: pip install mypy types-PyYAML
       - name: Check types
-        run: mypy src --ignore-missing-imports --check-untyped-defs 
+        run: mypy src --ignore-missing-imports --check-untyped-defs --explicit-package-bases
 
   unit-tests:
     name: Unit tests (pytest)
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: src:src/1_data_engineering
+      PYTHONPATH: src:src/1_data_engineering:src/2_model_training
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
