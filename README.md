@@ -52,3 +52,5 @@ Install `src/requirements.txt` on the job compute or environment.
 
 All tables live in the catalog set in `config.yml` (`catalog_mle` by default), in the `bronze`, `silver`, `gold`, `config` and `ml` schemas.
 Model: `<catalog>.ml.demand_forecasting_catboost`.
+
+Practice change to learn the CI/CD flow.
